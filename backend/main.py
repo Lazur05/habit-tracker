@@ -1,4 +1,5 @@
 from fastapi import Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -6,9 +7,18 @@ from database import engine, SessionLocal, Base
 from models import Habit
 from schemas import HabitCreate, HabitResponse
 
-Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['http://localhost:5173'],
+    allow_credentials=True,
+    allow_methods=['*'],
+    allow_headers=['*']
+)
+
+Base.metadata.create_all(bind=engine)
 
 def get_db():
     db = SessionLocal()

@@ -12,6 +12,7 @@ class HabitResponse(BaseModel):
     category: Optional[str]
     created_at: datetime
     completed_today: bool = False
+    streak: int = 0
 
     class Config:
         from_attributes = True

@@ -6,6 +6,7 @@ export interface Habit {
   category: string | null;
   created_at: string;
   completed_today: boolean;
+  streak: number;
 }
 
 export async function completeHabit(id:number): Promise<Habit> {

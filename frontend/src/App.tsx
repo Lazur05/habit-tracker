@@ -94,6 +94,13 @@ function App() {
                   {habit.name}
                 </p>
               </div>
+
+              {habit.streak > 0 && (
+                <span className="flex items-center gap-1 rounded-full bg-amber/10 px-2.5 py-1 text-xs font-medium text-amber">
+                  🔥 {habit.streak}
+                </span>
+              )}
+
               {habit.category && (
                 <span className="rounded-full bg-sage-light px-2.5 py-1 text-xs font-medium text-sage">
                   {habit.category}

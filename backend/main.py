@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -35,13 +35,38 @@ def habit_to_response(habit: Habit, db: Session) -> HabitResponse:
         HabitLog.completed_date == today
     ).first() is not None
 
+    streak = calculate_streak(habit.id, db)
+
     return HabitResponse(
         id=habit.id,
         name=habit.name,
         category=habit.category,
         created_at=habit.created_at,
         completed_today=completed_today,
+        streak=streak,
     )
+
+def calculate_streak(habit_id: int, db: Session) -> int:
+    logs = db.query(HabitLog).filter(HabitLog.habit_id == habit_id).all()
+    completed_dates = {log.completed_date for log in logs}
+
+    if not completed_dates:
+        return 0
+
+    today = date.today()
+    streak = 0
+    current_day = today
+
+    # jeśli dzisiaj jeszcze nie zaznaczone, streak wciąż może trwać
+    # zaczynamy liczenie opd wczoraj, żeby nie zerować streaka przedwcześnie
+    if today not in completed_dates:
+        current_day = today - timedelta(days=1)
+
+    while current_day in completed_dates:
+        streak += 1
+        current_day -= timedelta(days=1)
+
+    return streak
 
 @app.get("/habits", response_model=List[HabitResponse])
 def get_habits(db: Session = Depends(get_db)):

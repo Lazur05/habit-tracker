@@ -5,7 +5,25 @@ export interface Habit {
   name: string;
   category: string | null;
   created_at: string;
+  completed_today: boolean;
 }
+
+export async function completeHabit(id:number): Promise<Habit> {
+    const response = await fetch(`${BASE_URL}/habits/${id}/complete`, {
+        method: 'POST',
+    })
+    if (!response.ok) throw new Error("Nie udało się odznaczyć nawyku");
+    return response.json()
+}
+
+export async function uncompleteHabit(id:number): Promise<Habit> {
+    const response = await fetch(`${BASE_URL}/habits/${id}/complete`, {
+        method: 'DELETE',
+    })
+    if (!response.ok) throw new Error("Nie udało się cofnąć oznaczenia");
+    return response.json()
+}
+
 
 export interface habitCreate {
   name: string;

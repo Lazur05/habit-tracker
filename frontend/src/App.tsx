@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { getHabits, type Habit } from "./api/habits";
 import { completeHabit, uncompleteHabit } from "./api/habits";
 import HabitForm from "./components/HabitForm";
+import HeatmapCalendar from "./components/HeatmapCalendar";
 import "./index.css";
 
 function App() {
@@ -109,6 +110,10 @@ function App() {
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="mt-10 rounded-2xl border border-border bg-surface p-5">
+        <HeatmapCalendar />
       </div>
     </div>
   );

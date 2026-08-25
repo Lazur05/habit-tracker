@@ -53,12 +53,12 @@ function HeatmapCalendar() {
   const weeks = buildWeeks(entries);
   const max = Math.max(...entries.map((e) => e.count), 1);
 
-   return (
+  return (
     <div>
-      <p className="mb-3 text-sm font-medium uppercase tracking-widest text-ink-soft">
+      <p className="mb-3 text-center text-sm font-medium uppercase tracking-widest text-ink-soft">
         Ostatnie 3 miesiące
       </p>
-      <div className="flex gap-1 overflow-x-auto pb-2">
+      <div className="flex justify-center gap-1 overflow-x-auto pb-2">
         {weeks.map((week, weekIdx) => (
           <div key={weekIdx} className="flex flex-col gap-1">
             {week.map((entry, dayIdx) =>
@@ -70,7 +70,7 @@ function HeatmapCalendar() {
                 />
               ) : (
                 <div key={dayIdx} className="h-3 w-3" />
-              )
+              ),
             )}
           </div>
         ))}
@@ -79,4 +79,4 @@ function HeatmapCalendar() {
   );
 }
 
-export default HeatmapCalendar
+export default HeatmapCalendar;

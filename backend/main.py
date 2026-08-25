@@ -4,10 +4,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from typing import List
+from collections import defaultdict
+
 
 from database import engine, SessionLocal, Base
 from models import Habit, HabitLog
-from schemas import HabitCreate, HabitResponse
+from schemas import HabitCreate, HabitResponse, HeatmapEntry
 
 app = FastAPI()
 
@@ -114,3 +116,18 @@ def uncomplete_habit(habit_id: int, db: Session = Depends(get_db)):
 
     return habit_to_response(habit, db)
 
+@app.get('/stats/heatmap', response_model=List[HeatmapEntry])
+def get_heatmap(db: Session = Depends(get_db)):
+    start_date = date.today() - timedelta(days=89)
+    logs = db.query(HabitLog).filter(HabitLog.completed_date >= start_date).all()
+
+    counts = defaultdict(int)
+    for log in logs:
+        counts[log.completed_date] += 1
+
+    result = []
+    current = start_date
+    while current <= date.today():
+        result.append(HeatmapEntry(date=current, count=counts[current]))
+        current += timedelta(days=1)
+    return result

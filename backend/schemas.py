@@ -23,3 +23,7 @@ class HabitLogResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class HeatmapEntry(BaseModel):
+    date: date
+    count: int

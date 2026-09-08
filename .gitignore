@@ -4,6 +4,7 @@ backend/__pycache__/
 backend/*.pyc
 backend/habits.db
 backend/.env
+backend/seed_data.py
 
 # Node
 frontend/node_modules/

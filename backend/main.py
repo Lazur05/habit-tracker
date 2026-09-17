@@ -5,11 +5,13 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from typing import List
 from collections import defaultdict
+from fastapi.security import OAuth2PasswordRequestForm
 
 
+from auth import hash_password, verify_password, create_access_token, get_current_user
 from database import engine, SessionLocal, Base
-from models import Habit, HabitLog
-from schemas import HabitCreate, HabitResponse, HeatmapEntry
+from models import Habit, HabitLog, User
+from schemas import HabitCreate, HabitResponse, HeatmapEntry, UserCreate, UserResponse, Token
 
 app = FastAPI()
 
@@ -70,14 +72,36 @@ def calculate_streak(habit_id: int, db: Session) -> int:
 
     return streak
 
+
+@app.post("/auth/register", response_model=UserResponse)
+def register(user: UserCreate, db: Session = Depends(get_db)):
+    existing = db.query(User).filter(User.email == user.email).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Ten email jest już zajęty")
+
+    new_user = User(email= user.email, hashed_password=hash_password(user.password))
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
+
+@app.post('/auth/login', response_model=Token)
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == form_data.username).first()
+    if not user or not verify_password(form_data.password, user.hashed_password):
+        raise HTTPException(status_code=401, detail="Nieprawidłowy login lub hasło")
+
+    token = create_access_token({"sub": str(user.id)})
+    return {"access_token": token, "token_type": "bearer"}
+
 @app.get("/habits", response_model=List[HabitResponse])
-def get_habits(db: Session = Depends(get_db)):
-    habits = db.query(Habit).all()
+def get_habits(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    habits = db.query(Habit).filter(Habit.user_id == current_user.id).all()
     return [habit_to_response(h, db) for h in habits]
 
 @app.post("/habits", response_model=HabitResponse)
-def create_habit(habit: HabitCreate, db: Session = Depends(get_db)):
-    new_habit = Habit(name=habit.name, category = habit.category)
+def create_habit(habit: HabitCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    new_habit = Habit(name=habit.name, category = habit.category, user_id = current_user.id)
     db.add(new_habit)
     db.commit()
     db.refresh(new_habit)

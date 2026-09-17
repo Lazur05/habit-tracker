@@ -1,3 +1,5 @@
+import { authFetch } from './client'
+
 const BASE_URL = "http://127.0.0.1:8000";
 
 export interface Habit {
@@ -9,8 +11,14 @@ export interface Habit {
   streak: number;
 }
 
+export interface habitCreate {
+  name: string;
+  category?: string;
+}
+
+
 export async function completeHabit(id:number): Promise<Habit> {
-    const response = await fetch(`${BASE_URL}/habits/${id}/complete`, {
+    const response = await authFetch(`/habits/${id}/complete`, {
         method: 'POST',
     })
     if (!response.ok) throw new Error("Nie udało się odznaczyć nawyku");
@@ -18,7 +26,7 @@ export async function completeHabit(id:number): Promise<Habit> {
 }
 
 export async function uncompleteHabit(id:number): Promise<Habit> {
-    const response = await fetch(`${BASE_URL}/habits/${id}/complete`, {
+    const response = await authFetch(`/habits/${id}/complete`, {
         method: 'DELETE',
     })
     if (!response.ok) throw new Error("Nie udało się cofnąć oznaczenia");
@@ -26,13 +34,9 @@ export async function uncompleteHabit(id:number): Promise<Habit> {
 }
 
 
-export interface habitCreate {
-  name: string;
-  category?: string;
-}
 
 export async function getHabits(): Promise<Habit[]> {
-  const response = await fetch(`${BASE_URL}/habits`);
+  const response = await authFetch(`/habits`);
   if (!response.ok) {
     throw new Error("Nie udało się pobrać nawyków");
   }
@@ -40,7 +44,7 @@ export async function getHabits(): Promise<Habit[]> {
 }
 
 export async function createHabit(habit: habitCreate): Promise<Habit> {
-  const response = await fetch(`${BASE_URL}/habits`, {
+  const response = await authFetch(`/habits`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(habit),

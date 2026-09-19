@@ -54,7 +54,7 @@ function LoginPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-xl bg-ink px-5 py-2.5 font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="w-full rounded-xl bg-ink px-5 py-2.5 font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50 cursor-pointer"
           >
             {submitting ? "Logowanie..." : "Zaloguj się"}
           </button>
